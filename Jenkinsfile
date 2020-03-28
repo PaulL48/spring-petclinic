@@ -15,11 +15,14 @@ node {
       sh 'mvn package'
    }
 
-   if (env.BRANCH_NAME == "master") {
+   //if (env.BRANCH_NAME == "master") {
       stage('Deploy') {
+         when {
+            branch 'master'
+         }
          echo 'Deploying...'
          sh 'mvn deploy'
       }
-   }
+   //}
 
 }
