@@ -7,7 +7,8 @@ pipeline {
          returnStdout: true
       )
       COMMIT_DELTA = sh (
-         script: "\$((${COMMIT_COUNT} - 1))"
+         script: "\$((${COMMIT_COUNT} - 1))",
+         returnStdout: true
       )
    }
    stages {
