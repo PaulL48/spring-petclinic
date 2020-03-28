@@ -6,32 +6,15 @@ pipeline {
          script: "git rev-parse HEAD",
          returnStdout: true
       )
-      COMMIT_DELTA = sh (
-         script: "git rev-list --count ${LAST_BUILD}..HEAD",
-         returnStdout: true
-      )
+      LAST_BUILD = getLastBuild(LAST_BUILD_FILE, CURRENT_COMMIT)
+      COMMIT_DELTA = getCommitDelta(LAST_BUILD, CURRENT_COMMIT)
    }
    stages {
-      stage('Decide Whether to Build') {
-         steps {
-            script {
-               if (!fileExists ("${LAST_BUILD_FILE}")) {
-                  writeFile(
-                     file: "${LAST_BUILD_FILE}",
-                     text: "${CURRENT_COMMIT}"
-                  )
-               }
-            }
-            LAST_BUILD = readFile "${LAST_BUILD_FILE}"
-            COMMIT_DELTA = sh (
-               script: "git rev-list --count ${LAST_BUILD}..HEAD",
-               returnStdout: true
-            )
-         }
-      }
       stage('Build') {
          steps {
             echo 'Building...'
+            echo "${CURRENT_COMMIT}"
+            echo "${LAST_BUILD}"
             echo "${COMMIT_DELTA}"
             sh 'mvn clean'
             sh 'mvn compile'
@@ -90,4 +73,21 @@ pipeline {
 
       }
    }
+}
+
+def getLastBuild(lastBuildPath, currentCommit) {
+   if (!fileExists (lastBuildPath)) {
+      writeFile (
+         file: lastBuildPath,
+         text: currentCommit
+      )
+   }
+   return readFile (lastBuildPath)
+}
+
+def getCommitDelta(earlier, later) {
+   return sh (
+      script: "git rev-list --count ${earlier}..${later}",
+      returnStdout: true
+   )
 }
