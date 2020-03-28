@@ -15,7 +15,7 @@ pipeline {
       stage('Decide Whether to Build') {
          steps {
             script {
-               if (!fileExists "${LAST_BUILD_FILE}") {
+               if (!fileExists ("${LAST_BUILD_FILE}")) {
                   writeFile(
                      file: "${LAST_BUILD_FILE}",
                      text: "${CURRENT_COMMIT}"
