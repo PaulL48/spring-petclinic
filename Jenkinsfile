@@ -76,14 +76,19 @@ pipeline {
 }
 
 def getLastBuild(lastBuildPath, currentCommit) {
-   echo lastBuildPath
-   if (!fileExists (lastBuildPath)) {
-      writeFile (
-         file: lastBuildPath,
-         text: currentCommit
-      )
+   exists = sh (
+      script: "test -f /${lastBuildPath}",
+      returnStdout:true
+   )
+
+   if (!exists) {
+      sh "echo ${currentCommit} > /${lastBuildPath}"
    }
-   return readFile (lastBuildPath).trim()
+
+   return sh (
+      script: "cat /${lastBuildPath}",
+      returnStdout: true
+   ).trim()
 }
 
 def getCommitDelta(earlier, later) {
