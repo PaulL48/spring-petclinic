@@ -15,8 +15,11 @@ node {
       sh 'mvn package'
    }
 
-   stage('Deploy') {
-      echo 'Deploying...'
-      sh 'mvn deploy'
+   if (env.BRANCH_NAME == "master") {
+      stage('Deploy') {
+         echo 'Deploying...'
+         sh 'mvn deploy'
+      }
    }
+
 }
