@@ -1,7 +1,7 @@
 pipeline {
    agent any
    environment {
-      LAST_BUILD = 'some-hash'
+      LAST_BUILD = '62d58432cad547b10651d9e5e957d03935ab3696'
       COMMIT_COUNT_DELTA = sh (
          script: "\$((\$(git rev-list --count ${LAST_BUILD}..HEAD) - 1))",
          returnStdout: true
@@ -64,6 +64,10 @@ pipeline {
    post {
       success {
          slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+      }
+      failure {
+         slackSend (color: '#FF0000', message: "JOB FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}).")
+
       }
    }
 }
