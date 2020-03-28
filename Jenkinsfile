@@ -7,7 +7,7 @@ pipeline {
          returnStdout: true
       )
       COMMIT_DELTA = sh (
-         script: "\$(${COMMIT_COUNT} - 1)"
+         script: "\$((${COMMIT_COUNT} - 1))"
       )
    }
    stages {
@@ -15,7 +15,7 @@ pipeline {
          steps {
             echo 'Building...'
             echo "${COMMIT_COUNT}"
-            sh '\$(\$(git rev-list --count 62d58432cad547b10651d9e5e957d03935ab3696..HEAD) - 1)'
+            //sh '\$(\$(git rev-list --count 62d58432cad547b10651d9e5e957d03935ab3696..HEAD) - 1)'
             sh 'mvn clean'
             sh 'mvn compile'
 
