@@ -75,7 +75,7 @@ pipeline {
    }
 }
 
-def getLastBuild(lastBuildPath, currentCommit) {
+/*def getLastBuild(lastBuildPath, currentCommit) {
    try {
       exists = sh (
          script: "test -f /${lastBuildPath}",
@@ -93,9 +93,9 @@ def getLastBuild(lastBuildPath, currentCommit) {
       script: "cat /${lastBuildPath}",
       returnStdout: true
    ).trim()
-}
+}*/
 
-def getLastBuild2(lastBuildPath, currentCommit) {
+def getLastBuild(lastBuildPath, currentCommit) {
    try {
       unarchive (
          mapping: ["${lastBuildPath}": "${lastBuildPath}"]
