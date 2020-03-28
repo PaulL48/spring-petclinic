@@ -11,7 +11,7 @@ pipeline {
       stage('Build') {
          steps {
             echo 'Building...'
-            echo "${COMMIT_COUNT}"
+            echo "${COMMIT_DELTA}"
             sh 'mvn clean'
             sh 'mvn compile'
 
