@@ -1,13 +1,34 @@
 pipeline {
    agent any
    environment {
-      LAST_BUILD = readFile 'last_built_commit'
+      LAST_BUILD_FILE = 'last_built_commit'
+      CURRENT_COMMIT = sh (
+         script: "git rev-parse HEAD",
+         returnStdout: true
+      )
       COMMIT_DELTA = sh (
          script: "git rev-list --count ${LAST_BUILD}..HEAD",
          returnStdout: true
       )
    }
    stages {
+      stage('Decide Whether to Build') {
+         steps {
+            script {
+               if (!fileExists "${LAST_BUILD_FILE}") {
+                  writeFile(
+                     file: "${LAST_BUILD_FILE}",
+                     text: "${CURRENT_COMMIT}"
+                  )
+               }
+            }
+            LAST_BUILD = readFile "${LAST_BUILD_FILE}"
+            COMMIT_DELTA = sh (
+               script: "git rev-list --count ${LAST_BUILD}..HEAD",
+               returnStdout: true
+            )
+         }
+      }
       stage('Build') {
          steps {
             echo 'Building...'
