@@ -76,6 +76,7 @@ pipeline {
 }
 
 def getLastBuild(lastBuildPath, currentCommit) {
+   echo lastBuildPath
    if (!fileExists (lastBuildPath)) {
       writeFile (
          file: lastBuildPath,
