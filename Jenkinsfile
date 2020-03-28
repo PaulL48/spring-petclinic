@@ -11,7 +11,7 @@ pipeline {
       stage('Build') {
          steps {
             echo 'Building...'
-            sh 'git rev-list --count ${LAST_BUILD}..HEAD'
+            sh '\$((\$(git rev-list --count 62d58432cad547b10651d9e5e957d03935ab3696..HEAD) - 1))'
             sh 'mvn clean'
             sh 'mvn compile'
 
