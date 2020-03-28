@@ -3,7 +3,7 @@ pipeline {
    environment {
       LAST_BUILD = 'some-hash'
       COMMIT_COUNT_DELTA = sh (
-         script: "$(($(git rev-list --count ${LAST_BUILD}..HEAD) - 1))",
+         script: "\$((\$(git rev-list --count ${LAST_BUILD}..HEAD) - 1))",
          returnStdout: true
       )
    }
