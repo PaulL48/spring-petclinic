@@ -95,6 +95,26 @@ def getLastBuild(lastBuildPath, currentCommit) {
    ).trim()
 }
 
+def getLastBuild2(lastBuildPath, currentCommit) {
+   try {
+      unarchive (
+         mapping: ["${lastBuildPath}": "${lastBuildPath}"]
+      )
+   } catch (err) {
+      writeFile (
+         file: lastBuildPath,
+         text: currentCommit
+      )
+      archiveArtifact (
+         artifact: "${lastBuildPath}"
+      )
+      unarchive (
+         mapping: ["${lastBuildPath}": "${lastBuildPath}"]
+      )
+   }
+   return readFile("${lastBuildPath}").trim()
+}
+
 def getCommitDelta(earlier, later) {
    return sh (
       script: "git rev-list --count ${earlier}..${later}",
