@@ -82,7 +82,7 @@ def getLastBuild(lastBuildPath, currentCommit) {
          text: currentCommit
       )
    }
-   return readFile (lastBuildPath)
+   return readFile (lastBuildPath).trim()
 }
 
 def getCommitDelta(earlier, later) {
