@@ -1,7 +1,7 @@
 pipeline {
    agent any
    environment {
-      LAST_BUILD = '62d58432cad547b10651d9e5e957d03935ab3696'
+      LAST_BUILD = readFile 'last_built_commit'
       COMMIT_DELTA = sh (
          script: "git rev-list --count ${LAST_BUILD}..HEAD",
          returnStdout: true
@@ -14,7 +14,6 @@ pipeline {
             echo "${COMMIT_DELTA}"
             sh 'mvn clean'
             sh 'mvn compile'
-
          }
          post {
             failure {
