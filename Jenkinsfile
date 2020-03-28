@@ -105,7 +105,7 @@ def getLastBuild(lastBuildPath, currentCommit) {
          file: lastBuildPath,
          text: currentCommit
       )
-      archiveArtifact (
+      archiveArtifacts (
          artifact: "${lastBuildPath}"
       )
       unarchive (
