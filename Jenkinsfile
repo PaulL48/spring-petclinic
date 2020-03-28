@@ -8,12 +8,10 @@ pipeline {
       )
    }
    stages {
-      when {
-         equals expected: true, actual: false
-      }
       stage('Build') {
          steps {
             echo 'Building...'
+            echo "${COMMIT_COUNT_DELTA}"
             sh 'mvn clean'
             sh 'mvn compile'
 
