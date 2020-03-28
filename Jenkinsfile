@@ -76,10 +76,14 @@ pipeline {
 }
 
 def getLastBuild(lastBuildPath, currentCommit) {
-   exists = sh (
-      script: "test -f /${lastBuildPath}",
-      returnStdout:true
-   )
+   try {
+      exists = sh (
+         script: "test -f /${lastBuildPath}",
+         returnStdout: true
+      )
+   } catch (err) {
+      echo "Creating last good build file"
+   }
 
    if (!exists) {
       sh "echo ${currentCommit} > /${lastBuildPath}"
