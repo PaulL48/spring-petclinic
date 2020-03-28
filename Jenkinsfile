@@ -3,20 +3,17 @@ pipeline {
    environment {
       LAST_BUILD = '62d58432cad547b10651d9e5e957d03935ab3696'
       COMMIT_COUNT = sh (
+         // This gives the distance between two commits 1 higher than
          script: "git rev-list --count ${LAST_BUILD}..HEAD",
          returnStdout: true
       )
-      COMMIT_DELTA = sh (
-         script: "\$((${COMMIT_COUNT} - 1))",
-         returnStdout: true
-      )
+      COMMIT_DELTA = COMMIT_COUNT - 1
    }
    stages {
       stage('Build') {
          steps {
             echo 'Building...'
             echo "${COMMIT_COUNT}"
-            //sh '\$(\$(git rev-list --count 62d58432cad547b10651d9e5e957d03935ab3696..HEAD) - 1)'
             sh 'mvn clean'
             sh 'mvn compile'
 
