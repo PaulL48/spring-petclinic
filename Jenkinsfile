@@ -107,5 +107,5 @@ String getFileContents(String path) {
 }
 
 void writeFileContents(String path, String contents) {
-   sh("echo ${contents} >> ${path}")
+   sh("echo ${contents} > ${path}")
 }
