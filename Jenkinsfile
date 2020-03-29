@@ -53,7 +53,7 @@ nonBuildingPipeline = {
 
 node {
    checkout scm
-   String lastBuildFile = '/lastBuiltCommit.txt'
+   String lastBuildFile = '/lastBuiltHash.txt'
    String currentCommit = getGitObjectHash("HEAD")
    String lastBuild = getLastBuildHash(lastBuildFile)
    int commitDelta = getCommitDelta(lastBuild, currentCommit)
