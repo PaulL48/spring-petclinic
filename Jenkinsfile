@@ -1,12 +1,14 @@
 buildingPipeline = {
+   boolean jobSuccess = true
+
    try {
       stage('Build') {
-         sh 'mvn clean'
-         sh 'mvn compile'
+         sh('mvn clean')
+         sh('mvn compile')
       }
    } catch (err) {
-      slackSend (color: '#FF0000', message: "BUILD FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). Build errors are caused by malformed code, run the project locally to see build errors."
-      )
+      slackSend(color: '#FF0000', message: "BUILD FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). Build errors are caused by malformed code, run the project locally to see build errors.")
+      jobSuccess = false
    }
 
    try {
@@ -14,28 +16,32 @@ buildingPipeline = {
          sh('mvn test')
       }
    } catch (err) {
-      slackSend (color: '#FF0000', message: "TESTS FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). See build log for failed test or run 'mvn test' locally.")
-      jobFailure = true
+      slackSend(color: '#FF0000', message: "TESTS FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). See build log for failed test or run 'mvn test' locally.")
+      jobSuccess = false
    }
 
    try {
       stage('Package') {
-         echo 'Packaging...'
-         sh 'mvn package'
+         sh('mvn package')
       }
    } catch (err) {
-      slackSend (color: '#FF0000', message: "PACKAGE FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). See build log for failure details.")
+      slackSend(color: '#FF0000', message: "PACKAGE FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). See build log for failure details.")
+      jobSuccess = false
    }
 
    if (env.BRANCH_NAME == "master") {
       try {
          stage('Deploy') {
-            echo 'Deploying...'
-            sh 'mvn deploy'
+            sh('mvn deploy')
          }
       } catch (err) {
          slackSend (color: '#FF0000', message: "DEPLOY FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). See build log for failure details.")
+         jobSuccess = false
       }
+   }
+
+   if (jobSuccess) {
+      slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
    }
 }
 
@@ -48,12 +54,14 @@ nonBuildingPipeline = {
 node {
    checkout scm
    String lastBuildFile = '/lastBuiltCommit.txt'
-   String currentCommit = gitRevParse("HEAD")
+   String currentCommit = getGitObjectHash("HEAD")
    String lastBuild = getLastBuildHash(lastBuildFile)
    int commitDelta = getCommitDelta(lastBuild, currentCommit)
 
-   stage("Debug") {
-      echo "${commitDelta}"
+   stage("Pipeline Status") {
+      echo "Pipeline is configured to build the project every 8 commits"
+      echo("Last commit that was built: ${lastBuild}")
+      echo("Current commit is ${commitDelta} commits ahead")
    }
 
    if (commitDelta >= 8) {
@@ -67,7 +75,7 @@ node {
 String getLastBuildHash(String lastBuildPath) {
    String lastHash = getFileContents(lastBuildPath)
    if (lastHash == "") {
-      writeFileContents(lastBuildPath, gitRevParse("HEAD"))
+      writeFileContents(lastBuildPath, getGitObjectHash("HEAD"))
       lastHash = getFileContents(lastBuildPath)
    }
    return lastHash
@@ -80,7 +88,7 @@ int getCommitDelta(String earlier, String later) {
    )
 }
 
-String gitRevParse(String object) {
+String getGitObjectHash(String object) {
    return sh (
       script: "git rev-parse ${object}",
       returnStdout: true
