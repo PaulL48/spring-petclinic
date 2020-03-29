@@ -1,13 +1,12 @@
 node {
    checkout scm
-   String lastBuildFile = 'lastBuiltCommit.txt'
+   String lastBuildFile = '/lastBuiltCommit.txt'
    String currentCommit = gitRevParse("HEAD")
    String lastBuild = getLastBuildHash(lastBuildFile)
    int commitDelta = getCommitDelta(lastBuild, currentCommit)
 
    stage('Build') {
       echo 'Building...'
-      def temp = gitRevParse("HEAD")
       echo "${currentCommit}, ${lastBuild}, ${commitDelta}"
       sh 'mvn clean'
       sh 'mvn compile'
