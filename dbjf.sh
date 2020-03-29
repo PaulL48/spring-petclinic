@@ -1,5 +1,5 @@
 git status
 git add .
-git commit -m "Debugging Jenkinsfile"
+git commit -m "Testing Pipeline Script"
 git push
 
