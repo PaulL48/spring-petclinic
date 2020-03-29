@@ -31,12 +31,12 @@ node {
 
 
 String getLastBuildHash(String lastBuildPath) {
-   File commitFile = new File(lastBuildPath)
-   if (!commitFile.exists()) {
-      commitFile << getRevParse("HEAD")
+   String lastHash = getFileContents(lastBuildPath)
+   if (lastHash == "") {
+      writeFileContents(lastBuildPath, gitRevParse("HEAD"))
    }
 
-   return commitFile.text.trim()
+   return getFileContents.trim()
 }
 
 int getCommitDelta(String earlier, String later) {
@@ -51,4 +51,20 @@ String gitRevParse(String object) {
       script: "git rev-parse ${object}",
       returnStdout: true
    )
+}
+
+String getFileContents(String path) {
+   try {
+      def output = sh (
+         script: "cat ${path}",
+         returnStdout: true
+      )
+      return output
+   } catch (err) {
+      return ""
+   }
+}
+
+void writeFileContents(String path, String contents) {
+   sh("echo ${contents} >> path")
 }
