@@ -36,7 +36,7 @@ String getLastBuildHash(String lastBuildPath) {
       writeFileContents(lastBuildPath, gitRevParse("HEAD"))
    }
 
-   return getFileContents.trim()
+   return getFileContents(lastBuildPath).trim()
 }
 
 int getCommitDelta(String earlier, String later) {
