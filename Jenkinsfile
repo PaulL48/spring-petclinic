@@ -1,5 +1,3 @@
-
-
 nonBuildingPipeline = {
 
 }
@@ -10,7 +8,6 @@ buildingPipeline = {
    try {
       stage('Build') {
          echo 'Building...'
-         echo "${currentCommit}, ${lastBuild}, ${commitDelta}"
          sh 'mvn clean'
          sh 'mvn compile'
       }
