@@ -50,7 +50,7 @@ String gitRevParse(String object) {
    return sh (
       script: "git rev-parse ${object}",
       returnStdout: true
-   )
+   ).trim()
 }
 
 String getFileContents(String path) {
