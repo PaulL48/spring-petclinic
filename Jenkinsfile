@@ -52,21 +52,15 @@ node {
    String lastBuild = getLastBuildHash(lastBuildFile)
    int commitDelta = getCommitDelta(lastBuild, currentCommit)
 
+   stage("Debug") {
+      echo "${commitDelta}"
+   }
+
    if (commitDelta >= 8) {
       buildingPipeline()
       writeFileContents(lastBuildFile, currentCommit)
    } else {
       nonBuildingPipeline()
-   }
-}
-
-boolean ext_stage(String name, Closure steps, Closure postFailure) {
-   try {
-      stage(name) {
-         steps()
-      }
-   } catch (err) {
-      postFailure()
    }
 }
 
