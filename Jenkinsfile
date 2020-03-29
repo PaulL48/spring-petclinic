@@ -59,11 +59,11 @@ buildingPipeline = {
    }
 
    jobFailure |= ext_stage(
-      name: 'Test'
+      name: 'Test',
       steps: {
          echo('Testing...')
          sh('mvn test')
-      }
+      },
       postFailure: {
          slackSend (color: '#FF0000', message: "TESTS FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). See build log for failed test or run 'mvn test' locally.")
       }
