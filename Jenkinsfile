@@ -63,7 +63,6 @@ node {
       echo("Last commit that was built: ${lastBuild}")
       echo("Current commit is ${commitDelta} commits ahead")
    }
-   
    // If the previous build file is not yet created the commit delta will be 0
    // This is the only case where commit delta is 0 and therefore a build should take place
    if (commitDelta >= 8 || commitDelta == 0) {
