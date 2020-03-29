@@ -10,30 +10,30 @@ node {
    } else {
 
    }
+   buildingPipeline()
+   // stage('Build') {
+   //    echo 'Building...'
+   //    echo "${currentCommit}, ${lastBuild}, ${commitDelta}"
+   //    sh 'mvn clean'
+   //    sh 'mvn compile'
+   // }
 
-   stage('Build') {
-      echo 'Building...'
-      echo "${currentCommit}, ${lastBuild}, ${commitDelta}"
-      sh 'mvn clean'
-      sh 'mvn compile'
-   }
+   // stage('Test') {
+   //    echo 'Testing...'
+   //    sh 'mvn test'
+   // }
 
-   stage('Test') {
-      echo 'Testing...'
-      sh 'mvn test'
-   }
+   // stage('Package') {
+   //    echo 'Packaging...'
+   //    sh 'mvn package'
+   // }
 
-   stage('Package') {
-      echo 'Packaging...'
-      sh 'mvn package'
-   }
-
-   if (env.BRANCH_NAME == "master") {
-      stage('Deploy') {
-         echo 'Deploying...'
-         sh 'mvn deploy'
-      }
-   }
+   // if (env.BRANCH_NAME == "master") {
+   //    stage('Deploy') {
+   //       echo 'Deploying...'
+   //       sh 'mvn deploy'
+   //    }
+   // }
 }
 
 nonBuildingPipeline = {
