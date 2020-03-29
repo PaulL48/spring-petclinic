@@ -59,7 +59,7 @@ node {
    int commitDelta = getCommitDelta(lastBuild, currentCommit)
 
    stage("Pipeline Status") {
-      echo "Pipeline is configured to build the project every 8 commits"
+      echo("Pipeline is configured to build the project every 8 commits")
       echo("Last commit that was built: ${lastBuild}")
       echo("Current commit is ${commitDelta} commits ahead")
    }
