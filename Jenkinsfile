@@ -85,7 +85,7 @@ int getCommitDelta(String earlier, String later) {
    return sh (
       script: "git rev-list --count ${earlier}..${later}",
       returnStdout: true
-   )
+   ).trim()
 }
 
 String getGitObjectHash(String object) {
