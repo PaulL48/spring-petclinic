@@ -1,45 +1,47 @@
-nonBuildingPipeline = {
-
-}
-
 buildingPipeline = {
-   boolean jobFailure = false
-
    try {
       stage('Build') {
-         echo 'Building...'
          sh 'mvn clean'
          sh 'mvn compile'
       }
    } catch (err) {
-      slackSend (
-         color: '#FF0000', 
-         message: "BUILD FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). Build errors are caused by malformed code, run the project locally to see build errors."
+      slackSend (color: '#FF0000', message: "BUILD FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). Build errors are caused by malformed code, run the project locally to see build errors."
       )
+   }
+
+   try {
+      stage('Test') {
+         sh('mvn test')
+      }
+   } catch (err) {
+      slackSend (color: '#FF0000', message: "TESTS FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). See build log for failed test or run 'mvn test' locally.")
       jobFailure = true
    }
 
-   jobFailure |= ext_stage(
-      name: 'Test',
-      steps: {
-         echo('Testing...')
-         sh('mvn test')
-      },
-      postFailure: {
-         slackSend (color: '#FF0000', message: "TESTS FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). See build log for failed test or run 'mvn test' locally.")
+   try {
+      stage('Package') {
+         echo 'Packaging...'
+         sh 'mvn package'
       }
-   )
-
-   stage('Package') {
-      echo 'Packaging...'
-      sh 'mvn package'
+   } catch (err) {
+      slackSend (color: '#FF0000', message: "PACKAGE FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). See build log for failure details.")
    }
 
    if (env.BRANCH_NAME == "master") {
-      stage('Deploy') {
-         echo 'Deploying...'
-         sh 'mvn deploy'
+      try {
+         stage('Deploy') {
+            echo 'Deploying...'
+            sh 'mvn deploy'
+         }
+      } catch (err) {
+         slackSend (color: '#FF0000', message: "DEPLOY FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). See build log for failure details.")
       }
+   }
+}
+
+nonBuildingPipeline = {
+   stage('No Actions') {
+      echo("Current pipeline configured to build once every 8 commits")
    }
 }
 
@@ -50,35 +52,12 @@ node {
    String lastBuild = getLastBuildHash(lastBuildFile)
    int commitDelta = getCommitDelta(lastBuild, currentCommit)
 
-   if (commitDelta < 8) {
-
+   if (commitDelta >= 8) {
+      buildingPipeline()
+      writeFileContents(lastBuildFile, currentCommit)
    } else {
-
+      nonBuildingPipeline()
    }
-   buildingPipeline()
-   // stage('Build') {
-   //    echo 'Building...'
-   //    echo "${currentCommit}, ${lastBuild}, ${commitDelta}"
-   //    sh 'mvn clean'
-   //    sh 'mvn compile'
-   // }
-
-   // stage('Test') {
-   //    echo 'Testing...'
-   //    sh 'mvn test'
-   // }
-
-   // stage('Package') {
-   //    echo 'Packaging...'
-   //    sh 'mvn package'
-   // }
-
-   // if (env.BRANCH_NAME == "master") {
-   //    stage('Deploy') {
-   //       echo 'Deploying...'
-   //       sh 'mvn deploy'
-   //    }
-   // }
 }
 
 boolean ext_stage(String name, Closure steps, Closure postFailure) {
