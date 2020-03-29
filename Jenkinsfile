@@ -48,6 +48,8 @@ buildingPipeline = {
 nonBuildingPipeline = {
    stage('No Actions') {
       echo("Current pipeline configured to build once every 8 commits")
+      slackSend (color: '#0000FF', message: "BUILD NOT TRIGGERED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). Build is triggered every 8 commits")
+
    }
 }
 
