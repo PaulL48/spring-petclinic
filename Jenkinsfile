@@ -35,6 +35,7 @@ String getLastBuildHash(String lastBuildPath) {
    String lastHash = getFileContents(lastBuildPath)
    if (lastHash == "") {
       writeFileContents(lastBuildPath, gitRevParse("HEAD"))
+      lastHash = getFileContents(lastBuildPath)
    }
    return getFileContents(lastBuildPath).trim()
 }
@@ -55,11 +56,10 @@ String gitRevParse(String object) {
 
 String getFileContents(String path) {
    try {
-      def output = sh (
+      return sh (
          script: "cat ${path}",
          returnStdout: true
-      )
-      return output
+      ).trim()
    } catch (err) {
       return ""
    }
