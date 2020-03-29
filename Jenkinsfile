@@ -1,40 +1,4 @@
-node {
-   checkout scm
-   String lastBuildFile = '/lastBuiltCommit.txt'
-   String currentCommit = gitRevParse("HEAD")
-   String lastBuild = getLastBuildHash(lastBuildFile)
-   int commitDelta = getCommitDelta(lastBuild, currentCommit)
 
-   if (commitDelta < 8) {
-
-   } else {
-
-   }
-   buildingPipeline()
-   // stage('Build') {
-   //    echo 'Building...'
-   //    echo "${currentCommit}, ${lastBuild}, ${commitDelta}"
-   //    sh 'mvn clean'
-   //    sh 'mvn compile'
-   // }
-
-   // stage('Test') {
-   //    echo 'Testing...'
-   //    sh 'mvn test'
-   // }
-
-   // stage('Package') {
-   //    echo 'Packaging...'
-   //    sh 'mvn package'
-   // }
-
-   // if (env.BRANCH_NAME == "master") {
-   //    stage('Deploy') {
-   //       echo 'Deploying...'
-   //       sh 'mvn deploy'
-   //    }
-   // }
-}
 
 nonBuildingPipeline = {
 
@@ -80,6 +44,44 @@ buildingPipeline = {
          sh 'mvn deploy'
       }
    }
+}
+
+node {
+   checkout scm
+   String lastBuildFile = '/lastBuiltCommit.txt'
+   String currentCommit = gitRevParse("HEAD")
+   String lastBuild = getLastBuildHash(lastBuildFile)
+   int commitDelta = getCommitDelta(lastBuild, currentCommit)
+
+   if (commitDelta < 8) {
+
+   } else {
+
+   }
+   buildingPipeline()
+   // stage('Build') {
+   //    echo 'Building...'
+   //    echo "${currentCommit}, ${lastBuild}, ${commitDelta}"
+   //    sh 'mvn clean'
+   //    sh 'mvn compile'
+   // }
+
+   // stage('Test') {
+   //    echo 'Testing...'
+   //    sh 'mvn test'
+   // }
+
+   // stage('Package') {
+   //    echo 'Packaging...'
+   //    sh 'mvn package'
+   // }
+
+   // if (env.BRANCH_NAME == "master") {
+   //    stage('Deploy') {
+   //       echo 'Deploying...'
+   //       sh 'mvn deploy'
+   //    }
+   // }
 }
 
 boolean ext_stage(String name, Closure steps, Closure postFailure) {
