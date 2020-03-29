@@ -35,7 +35,6 @@ String getLastBuildHash(String lastBuildPath) {
    if (lastHash == "") {
       writeFileContents(lastBuildPath, gitRevParse("HEAD"))
    }
-
    return getFileContents(lastBuildPath).trim()
 }
 
