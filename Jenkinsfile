@@ -16,8 +16,10 @@ buildingPipeline = { boolean bisectAvailable, String currentCommit, String lastS
    }
 
    try {
-      stage('Test') {
-         sh('mvn test')
+      if (jobSuccess) {
+         stage('Test') {
+            sh('mvn test')
+         }
       }
    } catch (err) {
       stage('Log Test Failure') {
@@ -27,13 +29,14 @@ buildingPipeline = { boolean bisectAvailable, String currentCommit, String lastS
             "See build log for failed test or run 'mvn test' locally."
          )
       }
-      
       jobSuccess = false
    }
 
    try {
-      stage('Package') {
-         sh('mvn package')
+      if (jobSuccess) {
+         stage('Package') {
+            sh('mvn package')
+         }
       }
    } catch (err) {
       reportFailedCommit(
