@@ -69,6 +69,7 @@ node {
 
    stage("Pipeline Status") {
       echo("Pipeline is configured to build the project every 8 commits on master")
+      echo("Current commit: ${currentCommit}")
       echo("Last commit that was built: ${lastSuccessfulBuild}")
       echo("Current commit is ${deltaCommit} commits ahead")
    }
@@ -79,10 +80,8 @@ node {
          buildingPipeline((deltaCommit > 0), currentCommit, lastSuccessfulBuild, lastBuildFile)
       } else {
          nonBuildingPipeline()
-      }   
+      }
    }
-
-
 }
 
 String getLastBuildHash(String lastBuildPath) {
