@@ -69,7 +69,7 @@ node {
    String currentCommit = getCurrentCommit()
    String lastSuccessfulBuild = getLastBuildHash(lastBuildFile)
    int deltaCommit = 0
-
+ 
    if (lastSuccessfulBuild != "") {
       deltaCommit = getCommitDelta(lastSuccessfulBuild, currentCommit)
    }
@@ -150,7 +150,7 @@ String gitBisect(String stable, String breaking) {
    }
 
    String badCommit = getCurrentCommit()
-   
+
    sh("git stash")
    sh("git bisect reset")
    return badCommit
