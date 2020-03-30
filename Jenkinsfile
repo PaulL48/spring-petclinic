@@ -140,7 +140,7 @@ String gitBisect(String stable, String breaking) {
 
    // Git bisect does not make it easy to extract output
    // We may be on the last good or the first bad commit so we need to test
-   int testStatus = sh(
+   int testStatus = sh (
       script: "mvn clean test",
       returnStatus: true
    )
