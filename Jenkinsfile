@@ -128,7 +128,6 @@ void reportFailedCommit(String badCommit, String message) {
    slackSend(color: '#FF0000', message: message)
    slackSend(color: '#FF0000', message: "Failing commit hash: ${badCommit}")
    slackSend(color: '#FF0000', message: "Access at: https://github.com/PaulL48/spring-petclinic/commit/${badCommit}")
-
 }
 
 /**
