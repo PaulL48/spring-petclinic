@@ -135,7 +135,23 @@ void reportFailedCommit(String badCommit, String message) {
 String gitBisect(String stable, String breaking) {
    sh("git bisect start ${breaking} ${stable}")
    sh("git bisect run mvn clean test")
+
+
+
+   // Git bisect does not make it easy to extract output
+   // We may be on the last good or the first bad commit so we need to test
+   int testStatus = sh(
+      script: "mvn clean test",
+      returnStatus: true
+   )
+
+   // Advance head by 1 commit if tests pass
+   if (testStatus == 0) {
+      sh("git reset HEAD@{1}")
+   }
+
    String badCommit = getCurrentCommit()
+
    sh("git bisect reset")
    return badCommit
 }
