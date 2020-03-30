@@ -9,7 +9,7 @@ buildingPipeline = { boolean bisectAvailable, String currentCommit, String lastS
    } catch (err) {
       reportFailedCommit(
          currentCommit,
-         "BUILD FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). " + 
+         "BUILD FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). " +
          "Build errors are caused by malformed code, run the project locally to see build errors."
       )
       jobSuccess = false
