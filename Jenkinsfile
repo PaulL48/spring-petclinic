@@ -151,7 +151,6 @@ String gitBisect(String stable, String breaking) {
 
    String badCommit = getCurrentCommit()
 
-   sh("git stash")
    sh("git bisect reset")
    return badCommit
 }
