@@ -68,7 +68,7 @@ node {
    }
 
    stage("Pipeline Status") {
-      getCommitDelta(lastSuccessfulBuild, currentCommit)
+      deltaCommit = getCommitDelta(lastSuccessfulBuild, currentCommit)
       echo("Pipeline is configured to build the project every 8 commits on master")
       echo("Current commit: ${currentCommit}")
       echo("Last commit that was built: ${lastSuccessfulBuild}")
