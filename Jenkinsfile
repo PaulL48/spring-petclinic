@@ -97,7 +97,7 @@ int getCommitDelta(String earlier, String later) {
 
 String findFailedCommit(boolean bisectAvailable, String lastSuccessfulBuild, String currentCommit) {
    if (bisectionAvailable) {
-      return gitBisect(lastSuccessfulBuild, currentCommit),
+      return gitBisect(lastSuccessfulBuild, currentCommit)
    } else {
       return currentCommit
    }
