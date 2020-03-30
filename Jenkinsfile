@@ -73,15 +73,15 @@ node {
    }
 
    if (env.BRANCH_NAME == "master") {
-      return
+      if (deltaCommit >= 8 || deltaCommit == 0) {
+         // If commit delta is greater than zero, bisection is available
+         buildingPipeline((deltaCommit > 0), currentCommit, lastSuccessfulBuild, lastBuildFile)
+      } else {
+         nonBuildingPipeline()
+      }   
    }
 
-   if (deltaCommit >= 8 || deltaCommit == 0) {
-      // If commit delta is greater than zero, bisection is available
-      buildingPipeline((deltaCommit > 0), currentCommit, lastSuccessfulBuild, lastBuildFile)
-   } else {
-      nonBuildingPipeline()
-   }
+
 }
 
 String getLastBuildHash(String lastBuildPath) {
