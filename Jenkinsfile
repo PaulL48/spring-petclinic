@@ -42,8 +42,10 @@ buildingPipeline = { boolean bisectAvailable, String currentCommit, String lastS
    }
 
    if (jobSuccess) {
-      writeFileContents(lastBuildPath, currentCommit)
-      slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+      stage('Storing Build Info') {
+         writeFileContents(lastBuildPath, currentCommit)
+         slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+      }
    }
 }
 
