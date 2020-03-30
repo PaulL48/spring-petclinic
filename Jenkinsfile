@@ -1,4 +1,4 @@
-buildingPipeline = { boolean bisectAvailable, String currentCommit, String lastSuccessfulBuild ->
+buildingPipeline = { boolean bisectAvailable, String currentCommit, String lastSuccessfulBuild , String lastBuildPath->
    boolean jobSuccess = true
 
    try {
@@ -42,6 +42,7 @@ buildingPipeline = { boolean bisectAvailable, String currentCommit, String lastS
    }
 
    if (jobSuccess) {
+      writeFileContents(lastBuildPath, currentCommit)
       slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
    }
 }
@@ -57,7 +58,7 @@ node {
    // Implements the "Changes Detected" Flowchart
 
    checkout scm
-   String lastBuildFile = '/lastBuiltHash.txt'
+   String lastBuildFile = '/lastSuccessfulHash.txt'
    String currentCommit = getCurrentCommit()
    String lastSuccessfulBuild = getLastBuildHash(lastBuildFile)
    int deltaCommit = 0
