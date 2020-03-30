@@ -20,11 +20,14 @@ buildingPipeline = { boolean bisectAvailable, String currentCommit, String lastS
          sh('mvn test')
       }
    } catch (err) {
-      reportFailedCommit(
-         findFailedCommit(bisectAvailable, lastSuccessfulBuild, currentCommit),
-         "TESTS FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). " +
-         "See build log for failed test or run 'mvn test' locally."
-      )
+      stage('Log Test Failure') {
+         reportFailedCommit(
+            findFailedCommit(bisectAvailable, lastSuccessfulBuild, currentCommit),
+            "TESTS FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). " +
+            "See build log for failed test or run 'mvn test' locally."
+         )
+      }
+      
       jobSuccess = false
    }
 
