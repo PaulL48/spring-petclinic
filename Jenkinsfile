@@ -90,10 +90,17 @@ node {
    }
 }
 
+/**
+ * Return the last successful build hash or empty string if there is none
+ */
 String getLastBuildHash(String lastBuildPath) {
    return getFileContents(lastBuildPath)
 }
 
+/**
+ * Return the number of commits between two commits, including
+ * the endpoint
+ */
 int getCommitDelta(String earlier, String later) {
    String result = sh (
       script: "git rev-list --count ${earlier}..${later}",
@@ -102,6 +109,10 @@ int getCommitDelta(String earlier, String later) {
    return Integer.parseInt(result)
 }
 
+/**
+ * If bisection is available, perform bisect between current and last successful
+ * commit. Otherwise return the current commit
+ */
 String findFailedCommit(boolean bisectAvailable, String lastSuccessfulBuild, String currentCommit) {
    if (bisectAvailable) {
       return gitBisect(lastSuccessfulBuild, currentCommit)
@@ -110,11 +121,17 @@ String findFailedCommit(boolean bisectAvailable, String lastSuccessfulBuild, Str
    }
 }
 
+/**
+ * Send Slack notification containing a message and the commit that is failing
+ */
 void reportFailedCommit(String badCommit, String message) {
    slackSend(color: '#FF0000', message: message)
    slackSend(color: '#FF0000', message: "Failing commit hash: ${badCommit}")
 }
 
+/**
+ * Return the first hash failing mvn test between the endpoints
+ */
 String gitBisect(String stable, String breaking) {
    sh("git bisect start ${breaking} ${stable}")
    sh("git bisect run mvn clean test")
@@ -123,6 +140,9 @@ String gitBisect(String stable, String breaking) {
    return badCommit
 }
 
+/**
+ * Return the curretly checked out commit hash
+ */
 String getCurrentCommit() {
    return sh (
       script: 'git log -1 --format="%H"',
@@ -130,6 +150,9 @@ String getCurrentCommit() {
    ).trim()
 }
 
+/**
+ * Return file contents, or the empty string if it doesn't exist
+ */
 String getFileContents(String path) {
    try {
       return sh (
@@ -141,6 +164,9 @@ String getFileContents(String path) {
    }
 }
 
+/**
+ * Overwrite the supplied file with contents
+ */
 void writeFileContents(String path, String contents) {
    sh("echo ${contents} > ${path}")
 }
