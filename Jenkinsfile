@@ -78,7 +78,7 @@ node {
 
    if (deltaCommit >= 8 || deltaCommit == 0) {
       // If commit delta is greater than zero, bisection is available
-      buildingPipeline((deltaCommit > 0), lastSuccessfulBuild, currentCommit)
+      buildingPipeline((deltaCommit > 0), lastSuccessfulBuild, currentCommit, lastBuildFile)
    } else {
       nonBuildingPipeline()
    }
