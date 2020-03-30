@@ -69,7 +69,7 @@ node {
    stage("Pipeline Status") {
       echo("Pipeline is configured to build the project every 8 commits on master")
       echo("Last commit that was built: ${lastSuccessfulBuild}")
-      echo("Current commit is ${commitDelta} commits ahead")
+      echo("Current commit is ${deltaCommit} commits ahead")
    }
 
    if (env.BRANCH_NAME == "master") {
