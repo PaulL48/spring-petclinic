@@ -90,10 +90,16 @@ String getLastBuildHash(String lastBuildPath) {
 }
 
 int getCommitDelta(String earlier, String later) {
-   return sh (
+   // return sh (
+   //    script: "git rev-list --count ${earlier}..${later}",
+   //    returnStdout: true
+   // ).trim()
+
+   String result = sh (
       script: "git rev-list --count ${earlier}..${later}",
       returnStdout: true
    ).trim()
+   return Integer.parseInt(result)
 }
 
 String findFailedCommit(boolean bisectAvailable, String lastSuccessfulBuild, String currentCommit) {
