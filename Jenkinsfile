@@ -65,7 +65,7 @@ nonBuildingPipeline = {
 
 node {
    checkout scm
-   String lastBuildFile = '/last-build.txt'
+   String lastBuildFile = '/last--build.txt'
    String currentCommit = getCurrentCommit()
    String lastSuccessfulBuild = getLastBuildHash(lastBuildFile)
    int deltaCommit = 0
