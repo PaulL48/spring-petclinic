@@ -55,6 +55,7 @@ nonBuildingPipeline = {
 }
 
 node {
+   //
    checkout scm
    String lastBuildFile = '/lastSuccessfulHash.txt'
    String currentCommit = getCurrentCommit()
