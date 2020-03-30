@@ -55,7 +55,6 @@ nonBuildingPipeline = {
 }
 
 node {
-   // Implements the "Changes Detected" Flowchart
    checkout scm
    String lastBuildFile = '/lastSuccessfulHash.txt'
    String currentCommit = getCurrentCommit()
