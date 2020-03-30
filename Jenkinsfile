@@ -111,8 +111,8 @@ void reportFailedCommit(String badCommit, String message) {
    slackSend(color: '#FF0000', message: "Failing commit hash: ${badCommit}")
 }
 
-String gitBisect(String leftEndpoint, String rightEndpoint) {
-   sh("git bisect start ${leftEndpoint} ${rightEndpoint}")
+String gitBisect(String stable, String breaking) {
+   sh("git bisect start ${breaking} ${stable}")
    sh("git bisect run mvn clean test")
    String badCommit = getCurrentCommit()
    sh("git bisect reset")
