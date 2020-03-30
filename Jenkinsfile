@@ -68,9 +68,7 @@ node {
    }
 
    stage("Pipeline Status") {
-      deltaCommit = getCommitDelta(lastSuccessfulBuild, currentCommit)
       echo("Pipeline is configured to build the project every 8 commits on master")
-      echo("Current commit: ${currentCommit}")
       echo("Last commit that was built: ${lastSuccessfulBuild}")
       echo("Current commit is ${deltaCommit} commits ahead")
    }
@@ -90,11 +88,6 @@ String getLastBuildHash(String lastBuildPath) {
 }
 
 int getCommitDelta(String earlier, String later) {
-   // return sh (
-   //    script: "git rev-list --count ${earlier}..${later}",
-   //    returnStdout: true
-   // ).trim()
-
    String result = sh (
       script: "git rev-list --count ${earlier}..${later}",
       returnStdout: true
