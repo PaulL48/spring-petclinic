@@ -1,4 +1,4 @@
-buildingPipeline = { boolean bisectAvailable, String currentCommit, String lastSuccessfulBuild , String lastBuildPath->
+buildingPipeline = { boolean bisectAvailable, String currentCommit, String lastSuccessfulBuild , String lastBuildPath ->
    boolean jobSuccess = true
 
    try {
@@ -99,7 +99,7 @@ String getLastBuildHash(String lastBuildPath) {
 
 /**
  * Return the number of commits between two commits, including
- * the endpoint
+ * the right endpoint
  */
 int getCommitDelta(String earlier, String later) {
    String result = sh (
@@ -127,6 +127,8 @@ String findFailedCommit(boolean bisectAvailable, String lastSuccessfulBuild, Str
 void reportFailedCommit(String badCommit, String message) {
    slackSend(color: '#FF0000', message: message)
    slackSend(color: '#FF0000', message: "Failing commit hash: ${badCommit}")
+   slackSend(color: '#FF0000', message: "Access at: https://github.com/PaulL48/spring-petclinic/commit/${badCommit}")
+
 }
 
 /**
@@ -135,8 +137,6 @@ void reportFailedCommit(String badCommit, String message) {
 String gitBisect(String stable, String breaking) {
    sh("git bisect start ${breaking} ${stable}")
    sh("git bisect run mvn clean test")
-
-
 
    // Git bisect does not make it easy to extract output
    // We may be on the last good or the first bad commit so we need to test
@@ -156,9 +156,6 @@ String gitBisect(String stable, String breaking) {
    return badCommit
 }
 
-/**
- * Return the curretly checked out commit hash
- */
 String getCurrentCommit() {
    return sh (
       script: 'git log -1 --format="%H"',
@@ -166,9 +163,6 @@ String getCurrentCommit() {
    ).trim()
 }
 
-/**
- * Return file contents, or the empty string if it doesn't exist
- */
 String getFileContents(String path) {
    try {
       return sh (
@@ -180,9 +174,6 @@ String getFileContents(String path) {
    }
 }
 
-/**
- * Overwrite the supplied file with contents
- */
 void writeFileContents(String path, String contents) {
    sh("echo ${contents} > ${path}")
 }
