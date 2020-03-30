@@ -29,6 +29,7 @@ buildingPipeline = { boolean bisectAvailable, String currentCommit, String lastS
             "See build log for failed test or run 'mvn test' locally."
          )
       }
+      error("Test stage failed")
       jobSuccess = false
    }
 
