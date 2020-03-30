@@ -1,4 +1,4 @@
-buildingPipeline = {
+buildingPipeline = { boolean bisectAvailable, String currentCommit, String lastSuccessfulBuild ->
    boolean jobSuccess = true
 
    try {
@@ -7,7 +7,11 @@ buildingPipeline = {
          sh('mvn compile')
       }
    } catch (err) {
-      slackSend(color: '#FF0000', message: "BUILD FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). Build errors are caused by malformed code, run the project locally to see build errors.")
+      reportFailedCommit(
+         currentCommit,
+         "BUILD FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). " + 
+         "Build errors are caused by malformed code, run the project locally to see build errors."
+      )
       jobSuccess = false
    }
 
@@ -16,7 +20,11 @@ buildingPipeline = {
          sh('mvn test')
       }
    } catch (err) {
-      slackSend(color: '#FF0000', message: "TESTS FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). See build log for failed test or run 'mvn test' locally.")
+      reportFailedCommit(
+         findFailedCommit(bisectAvailable, lastSuccessfulBuild, currentCommit),
+         "TESTS FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). " +
+         "See build log for failed test or run 'mvn test' locally."
+      )
       jobSuccess = false
    }
 
@@ -25,19 +33,12 @@ buildingPipeline = {
          sh('mvn package')
       }
    } catch (err) {
-      slackSend(color: '#FF0000', message: "PACKAGE FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). See build log for failure details.")
+      reportFailedCommit(
+         currentCommit,
+         "PACKAGE FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). " +
+         "See build log for failure details."
+      )
       jobSuccess = false
-   }
-
-   if (env.BRANCH_NAME == "master") {
-      try {
-         stage('Deploy') {
-            sh('mvn deploy')
-         }
-      } catch (err) {
-         slackSend (color: '#FF0000', message: "DEPLOY FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). See build log for failure details.")
-         jobSuccess = false
-      }
    }
 
    if (jobSuccess) {
@@ -49,40 +50,42 @@ nonBuildingPipeline = {
    stage('No Actions') {
       echo("Current pipeline configured to build once every 8 commits")
       slackSend (color: '#0000FF', message: "BUILD NOT TRIGGERED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). Build is triggered every 8 commits")
-
    }
 }
 
 node {
+   // Implements the "Changes Detected" Flowchart
+
    checkout scm
    String lastBuildFile = '/lastBuiltHash.txt'
-   String currentCommit = getGitObjectHash("HEAD")
-   String lastBuild = getLastBuildHash(lastBuildFile)
-   int commitDelta = getCommitDelta(lastBuild, currentCommit)
+   String currentCommit = getCurrentCommit()
+   String lastSuccessfulBuild = getLastBuildHash(lastBuildFile)
+   int deltaCommit = 0
+
+   if (lastSuccessfulBuild != "") {
+      deltaCommit = getCommitDelta(lastSuccessfulBuild, currentCommit)
+   }
 
    stage("Pipeline Status") {
-      echo("Pipeline is configured to build the project every 8 commits")
+      echo("Pipeline is configured to build the project every 8 commits on master")
       echo("Last commit that was built: ${lastBuild}")
       echo("Current commit is ${commitDelta} commits ahead")
    }
 
-   // If the previous build file is not yet created the commit delta will be 0
-   // This is the only case where commit delta is 0 and therefore a build should take place
-   if (commitDelta >= 8 || commitDelta == 0) {
-      buildingPipeline()
-      writeFileContents(lastBuildFile, currentCommit)
+   if (env.BRANCH_NAME == "master") {
+      return
+   }
+
+   if (deltaCommit >= 8 || deltaCommit == 0) {
+      // If commit delta is greater than zero, bisection is available
+      buildingPipeline((deltaCommit > 0), lastSuccessfulBuild, currentCommit)
    } else {
       nonBuildingPipeline()
    }
 }
 
 String getLastBuildHash(String lastBuildPath) {
-   String lastHash = getFileContents(lastBuildPath)
-   if (lastHash == "") {
-      writeFileContents(lastBuildPath, getGitObjectHash("HEAD"))
-      lastHash = getFileContents(lastBuildPath)
-   }
-   return lastHash
+   return getFileContents(lastBuildPath)
 }
 
 int getCommitDelta(String earlier, String later) {
@@ -92,9 +95,30 @@ int getCommitDelta(String earlier, String later) {
    ).trim()
 }
 
-String getGitObjectHash(String object) {
+String findFailedCommit(boolean bisectAvailable, String lastSuccessfulBuild, String currentCommit) {
+   if (bisectionAvailable) {
+      return gitBisect(lastSuccessfulBuild, currentCommit),
+   } else {
+      return currentCommit
+   }
+}
+
+void reportFailedCommit(String badCommit, String message) {
+   slackSend(color: '#FF0000', message: message)
+   slackSend(color: '#FF0000', message: "Failing commit hash: ${badCommit}")
+}
+
+String gitBisect(String leftEndpoint, String rightEndpoint) {
+   sh("git bisect start ${leftEndpoint} ${rightEndpoint}")
+   sh("git bisect run mvn clean test")
+   String badCommit = getCurrentCommit()
+   sh("git bisect reset")
+   return badCommit
+}
+
+String getCurrentCommit() {
    return sh (
-      script: "git rev-parse ${object}",
+      script: 'git log -1 --format="%H"',
       returnStdout: true
    ).trim()
 }
