@@ -130,7 +130,7 @@ void reportFailedCommit(String badCommit, String message) {
 }
 
 /**
- * Return the first hash failing mvn test between the endpoints
+ * Performs a git bisect and return the resulting commit
  */
 String gitBisect(String stable, String breaking) {
    sh("git bisect start ${breaking} ${stable}")
