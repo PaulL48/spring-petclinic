@@ -1,4 +1,4 @@
-buildingPipeline = {String currentCommit, String lastSuccessfulBuild , String lastBuildPath ->
+buildingPipeline = { boolean bisectAvailable, String currentCommit, String lastSuccessfulBuild , String lastBuildPath ->
    boolean jobSuccess = true
 
    try {
@@ -24,7 +24,7 @@ buildingPipeline = {String currentCommit, String lastSuccessfulBuild , String la
    } catch (err) {
       stage('Log Test Failure') {
          reportFailedCommit(
-            findFailedCommit(lastSuccessfulBuild, currentCommit),
+            findFailedCommit(bisectAvailable, lastSuccessfulBuild, currentCommit),
             "TESTS FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}). " +
             "See build log for failed test or run 'mvn test' locally."
          )
@@ -113,8 +113,8 @@ int getCommitDelta(String earlier, String later) {
  * If bisection is available, perform bisect between current and last successful
  * commit. Otherwise return the current commit
  */
-String findFailedCommit(String lastSuccessfulBuild, String currentCommit) {
-   if (lastSuccessfulBuild != "") {
+String findFailedCommit(boolean bisectAvailable, String lastSuccessfulBuild, String currentCommit) {
+   if (bisectAvailable) {
       return gitBisect(lastSuccessfulBuild, currentCommit)
    } else {
       return currentCommit
